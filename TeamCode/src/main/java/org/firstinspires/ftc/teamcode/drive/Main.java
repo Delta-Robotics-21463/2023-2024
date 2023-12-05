@@ -26,6 +26,8 @@ public class Main extends LinearOpMode {
         Servo rightWrist = hardwareMap.servo.get("rightWrist");
         Servo leftFlip = hardwareMap.servo.get("leftFlip");
         Servo rightFlip = hardwareMap.servo.get("rightFlip");
+        Servo leftClaw = hardwareMap.servo.get("leftClaw");
+        Servo rightClaw = hardwareMap.servo.get("rightClaw");
 
 
         frontRightMotor.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -43,6 +45,8 @@ public class Main extends LinearOpMode {
         imu.initialize(parameters);
 
         waitForStart();
+        rightFlip.setPosition(0.5);
+        leftFlip.setPosition(0.5);
 
         if (isStopRequested()) return;
 
@@ -78,18 +82,30 @@ public class Main extends LinearOpMode {
             rightElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
             leftElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
             if (gamepad1.right_bumper) {
-                rightFlip.setPosition(rightFlip.getPosition() + 1);
-                leftFlip.setPosition(leftFlip.getPosition() - 1);
+                rightFlip.setPosition(rightFlip.getPosition() + 0.025);
+                leftFlip.setPosition(1-rightFlip.getPosition());
             } else if (gamepad1.left_bumper) {
-                rightFlip.setPosition(rightFlip.getPosition()-1);
-                leftFlip.setPosition(leftFlip.getPosition()+1);
+                rightFlip.setPosition(rightFlip.getPosition()-0.025);
+                leftFlip.setPosition(1-rightFlip.getPosition());
             }
             if (gamepad1.dpad_right) {
-                rightWrist.setPosition(rightWrist.getPosition()+1);
-                leftWrist.setPosition(leftWrist.getPosition()-1);
+                rightWrist.setPosition(rightWrist.getPosition()+0.025);
+                leftWrist.setPosition(1-rightWrist.getPosition());
             } else if (gamepad1.dpad_left) {
-                rightWrist.setPosition(rightWrist.getPosition()-1);
-                leftWrist.setPosition(leftWrist.getPosition()+1);
+                rightWrist.setPosition(rightWrist.getPosition()-0.025);
+                leftWrist.setPosition(1-leftWrist.getPosition());
+            }
+            if (gamepad1.a) {
+                rightClaw.setPosition(rightClaw.getPosition()+0.05);
+            }
+            if (gamepad1.b) {
+                leftClaw.setPosition(leftClaw.getPosition()+0.05);
+            }
+            if (gamepad1.y) {
+                rightClaw.setPosition(rightClaw.getPosition()-0.05);
+            }
+            if (gamepad1.x) {
+                leftClaw.setPosition(leftClaw.getPosition()-0.05);
             }
 
 
@@ -97,6 +113,22 @@ public class Main extends LinearOpMode {
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
             backRightMotor.setPower(backRightPower);
+
+            telemetry.addData("front left power", frontLeftPower);
+            telemetry.addData("back left power", backLeftPower);
+            telemetry.addData("front right power", frontRightPower);
+            telemetry.addData("back right power", backRightPower);
+            telemetry.addData("right elevator power", rightElevator.getPower());
+            telemetry.addData("left elevator power", leftElevator.getPower());
+            telemetry.addData("right flip position", rightFlip.getPosition());
+            telemetry.addData("left flip position", leftFlip.getPosition());
+            telemetry.addData("right wrist position", rightWrist.getPosition());
+            telemetry.addData("left wrist position", leftWrist.getPosition());
+            telemetry.addData("right claw position", rightClaw.getPosition());
+            telemetry.addData("left claw position", leftClaw.getPosition());
+
+            telemetry.addData("bot heading", botHeading);
+            telemetry.update();
         }
     }
 }
