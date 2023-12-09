@@ -36,8 +36,8 @@ public class BlueAuto extends LinearOpMode {
 
         propPipeline = new PropPipeline();
         portal = new VisionPortal.Builder()
-                .setCamera(hardwareMap.get(WebcamName.class, "Webcam"))
-                .setCameraResolution(new Size(1920, 1080))
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .setCameraResolution(new Size(1280, 720)) // 1920 1080
                 .setCamera(BuiltinCameraDirection.BACK)
                 .addProcessor(propPipeline)
 //                .setStreamFormat(VisionPortal.StreamFormat.MJPEG)
@@ -71,21 +71,24 @@ public class BlueAuto extends LinearOpMode {
                 yellowScorePos = new Pose2d(0,0,0);
                 purpleScorePos = new Pose2d(0,0,0);
                 parkPos = new Pose2d(0,0,0);
+                telemetry.addData("POS", "LEFT");
                 break;
             case CENTER:
                 yellowScorePos = new Pose2d(0,0,0);
                 purpleScorePos = new Pose2d(0,0,0);
                 parkPos = new Pose2d(0,0,0);
+                telemetry.addData("POS", "CENTER");
                 break;
             case RIGHT:
                 yellowScorePos = new Pose2d(0,0,0);
                 purpleScorePos = new Pose2d(0,0,0);
                 parkPos = new Pose2d(0,0,0);
+                telemetry.addData("POS", "RIGHT");
                 break;
             default:
                 break;
-
         }
+        telemetry.update();
         waitForStart();
 
 

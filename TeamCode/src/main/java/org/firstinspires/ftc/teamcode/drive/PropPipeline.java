@@ -1,5 +1,9 @@
 package org.firstinspires.ftc.teamcode.drive;
 
+import static org.apache.commons.math3.util.Precision.round;
+
+import static java.lang.Math.ceil;
+
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
@@ -31,24 +35,26 @@ public class PropPipeline implements VisionProcessor, CameraStreamSource {
     private Rect leftZoneArea;
     private Rect centerZoneArea;
 
+    static double zoneFactor = 2/3;
+
     private Mat finalMat = new Mat();
 
-    public static int blueLeftX = 800;
-    public static int blueLeftY = 550;
+    public static int blueLeftX = (int) ceil(800.0 * zoneFactor);
+    public static int blueLeftY =  (int) ceil(550.0 * zoneFactor);
 
-    public static int blueCenterX = 1175;
-    public static int blueCenterY = 175;
+    public static int blueCenterX = (int) ceil(1175.0 * zoneFactor);
+    public static int blueCenterY =  (int) ceil(175.0 * zoneFactor);
 
-    public static int redLeftX = 900;
-    public static int redLeftY = 525;
+    public static int redLeftX = (int) ceil(900 * zoneFactor);
+    public static int redLeftY = (int) ceil(525 * zoneFactor);
 
-    public static int redCenterX = 1325;
-    public static int redCenterY = 100;
+    public static int redCenterX = (int) ceil(1325*zoneFactor);
+    public static int redCenterY = (int) ceil(100*zoneFactor);
 
     public static int width = 125;
     public static int height = 125;
 
-    public static double redThreshold = 2.5;
+    public static double redThreshold = 0.2;
     public static double blueThreshold = 0.2;
     public static double threshold = 0;
 
