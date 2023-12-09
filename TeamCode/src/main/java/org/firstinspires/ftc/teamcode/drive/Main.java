@@ -46,7 +46,7 @@ public class Main extends LinearOpMode {
         imu.initialize(parameters);
 
         waitForStart();
-        int startPosition = -flip.getCurrentPosition();
+        int startPosition = flip.getCurrentPosition();
         flip.setTargetPosition(startPosition);
         flip.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -86,9 +86,9 @@ public class Main extends LinearOpMode {
             rightElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
             leftElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
             if (gamepad1.right_bumper) {
-                flip.setTargetPosition((flip.getTargetPosition()+startPosition)+20);
+                flip.setTargetPosition((flip.getTargetPosition())+20);
             } else if (gamepad1.left_bumper) {
-                flip.setTargetPosition((flip.getTargetPosition()+startPosition)-20);
+                flip.setTargetPosition((flip.getTargetPosition())-20);
             }
             if (gamepad1.dpad_right) {
                 rightWrist.setPosition(rightWrist.getPosition()+0.05);
@@ -125,7 +125,9 @@ public class Main extends LinearOpMode {
             telemetry.addData("back right power", backRightPower);
             telemetry.addData("right elevator power", rightElevator.getPower());
             telemetry.addData("left elevator power", leftElevator.getPower());
-            telemetry.addData("flip position", flip.getCurrentPosition()+startPosition);
+            telemetry.addData("flip position", flip.getCurrentPosition()-startPosition);
+            telemetry.addData("flip start position", startPosition);
+            telemetry.addData("non-compensated flip position", flip.getCurrentPosition());
             telemetry.addData("flip target position", flip.getTargetPosition());
             telemetry.addData("right wrist position", rightWrist.getPosition());
             telemetry.addData("left wrist position", leftWrist.getPosition());
