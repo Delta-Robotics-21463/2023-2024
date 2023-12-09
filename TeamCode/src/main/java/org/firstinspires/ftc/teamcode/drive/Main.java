@@ -24,8 +24,9 @@ public class Main extends LinearOpMode {
         DcMotor rightElevator = hardwareMap.dcMotor.get("rightElevator");
         Servo leftWrist = hardwareMap.servo.get("leftWrist");
         Servo rightWrist = hardwareMap.servo.get("rightWrist");
-        Servo leftFlip = hardwareMap.servo.get("leftFlip");
-        Servo rightFlip = hardwareMap.servo.get("rightFlip");
+        DcMotor flip = hardwareMap.dcMotor.get("flip");
+
+
         Servo leftClaw = hardwareMap.servo.get("leftClaw");
         Servo rightClaw = hardwareMap.servo.get("rightClaw");
 
@@ -45,12 +46,15 @@ public class Main extends LinearOpMode {
         imu.initialize(parameters);
 
         waitForStart();
-        rightFlip.setPosition(0.5);
-        leftFlip.setPosition(0.5);
+        int startPosition = -flip.getCurrentPosition();
+        flip.setTargetPosition(startPosition);
+        flip.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
 
         if (isStopRequested()) return;
 
         while (opModeIsActive()) {
+            double flipPower = 1f;
             double y = -gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = gamepad1.left_stick_x;
             double rx = gamepad1.right_stick_x;
@@ -82,33 +86,34 @@ public class Main extends LinearOpMode {
             rightElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
             leftElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
             if (gamepad1.right_bumper) {
-                rightFlip.setPosition(rightFlip.getPosition() + 0.025);
-                leftFlip.setPosition(1-rightFlip.getPosition());
+                flip.setTargetPosition((flip.getTargetPosition()+startPosition)+20);
             } else if (gamepad1.left_bumper) {
-                rightFlip.setPosition(rightFlip.getPosition()-0.025);
-                leftFlip.setPosition(1-rightFlip.getPosition());
+                flip.setTargetPosition((flip.getTargetPosition()+startPosition)-20);
             }
             if (gamepad1.dpad_right) {
-                rightWrist.setPosition(rightWrist.getPosition()+0.025);
+                rightWrist.setPosition(rightWrist.getPosition()+0.05);
                 leftWrist.setPosition(1-rightWrist.getPosition());
             } else if (gamepad1.dpad_left) {
-                rightWrist.setPosition(rightWrist.getPosition()-0.025);
-                leftWrist.setPosition(1-leftWrist.getPosition());
+                rightWrist.setPosition(rightWrist.getPosition()-0.05);
+                leftWrist.setPosition(1-rightWrist.getPosition());
             }
             if (gamepad1.a) {
-                rightClaw.setPosition(rightClaw.getPosition()+0.05);
+                rightClaw.setPosition(1);
             }
             if (gamepad1.b) {
-                leftClaw.setPosition(leftClaw.getPosition()+0.05);
+                leftClaw.setPosition(0.2);
             }
             if (gamepad1.y) {
-                rightClaw.setPosition(rightClaw.getPosition()-0.05);
+                rightClaw.setPosition(0);
             }
             if (gamepad1.x) {
-                leftClaw.setPosition(leftClaw.getPosition()-0.05);
+                leftClaw.setPosition(1);
+            }
+            if (gamepad1.dpad_down) {
+                flip.setTargetPosition(startPosition);
             }
 
-
+            flip.setPower(flipPower);
             frontLeftMotor.setPower(frontLeftPower);
             backLeftMotor.setPower(backLeftPower);
             frontRightMotor.setPower(frontRightPower);
@@ -120,8 +125,8 @@ public class Main extends LinearOpMode {
             telemetry.addData("back right power", backRightPower);
             telemetry.addData("right elevator power", rightElevator.getPower());
             telemetry.addData("left elevator power", leftElevator.getPower());
-            telemetry.addData("right flip position", rightFlip.getPosition());
-            telemetry.addData("left flip position", leftFlip.getPosition());
+            telemetry.addData("flip position", flip.getCurrentPosition()+startPosition);
+            telemetry.addData("flip target position", flip.getTargetPosition());
             telemetry.addData("right wrist position", rightWrist.getPosition());
             telemetry.addData("left wrist position", leftWrist.getPosition());
             telemetry.addData("right claw position", rightClaw.getPosition());
