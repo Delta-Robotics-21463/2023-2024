@@ -29,7 +29,7 @@ public class BlueAuto extends LinearOpMode {
 
 
     @Override
-    public void runOpMode() {
+    public void runOpMode() throws InterruptedException {
 
         Servo leftWrist = hardwareMap.servo.get("leftWrist");
         Servo rightWrist = hardwareMap.servo.get("rightWrist");
@@ -78,31 +78,57 @@ public class BlueAuto extends LinearOpMode {
 
         Side side = propPipeline.getLocation();
 
-        Vector2d yellowScorePos = new Vector2d();
-        Vector2d purpleScorePos = new Vector2d();
-        Vector2d parkPos = new Vector2d();
+        Trajectory yellowScorePos = null;
+        Trajectory purpleScorePos = null;
+        Trajectory parkPos = null;
 
 
         // 0.3, 300
+        Pose2d startPose = new Pose2d(15, 60, Math.toRadians(270));
+        drive.setPoseEstimate(startPose);
 
         switch (side) {
             case LEFT:
                 // TODO: add poses
-                yellowScorePos = new Vector2d(45,30);
-                purpleScorePos = new Vector2d(15,30);
-                parkPos = new Vector2d(60,60);
+                purpleScorePos = drive.trajectoryBuilder(startPose)
+                        .splineTo(new Vector2d(33, 56), 0)
+                        .splineTo(new Vector2d(42, 33), Math.toRadians(180))
+                        .build();
+
+                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
+                        .splineToConstantHeading(new Vector2d(47,40), Math.toRadians(180))
+                        .build();
+                parkPos = drive.trajectoryBuilder(yellowScorePos.end())
+                        .splineTo(new Vector2d(60,60), 0)
+                        .build();
                 telemetry.addData("POS", "LEFT");
                 break;
             case CENTER:
-                yellowScorePos = new Vector2d(45,30);
-                purpleScorePos = new Vector2d(15,30);
-                parkPos = new Vector2d(60,60);
+                purpleScorePos = drive.trajectoryBuilder(startPose)
+                        .splineTo(new Vector2d(33, 56), 0)
+                        .splineTo(new Vector2d(42, 33), Math.toRadians(180))
+                        .build();
+
+                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
+                        .splineToConstantHeading(new Vector2d(47,40), Math.toRadians(180))
+                        .build();
+                parkPos = drive.trajectoryBuilder(yellowScorePos.end())
+                        .splineTo(new Vector2d(60,60), 0)
+                        .build();
                 telemetry.addData("POS", "CENTER");
                 break;
             case RIGHT:
-                yellowScorePos = new Vector2d(45,30);
-                purpleScorePos = new Vector2d(15,30);
-                parkPos = new Vector2d(60,60);
+                purpleScorePos = drive.trajectoryBuilder(startPose)
+                        .splineTo(new Vector2d(33, 56), 0)
+                        .splineTo(new Vector2d(42, 33), Math.toRadians(180))
+                        .build();
+
+                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
+                        .splineToConstantHeading(new Vector2d(47,40), Math.toRadians(180))
+                        .build();
+                parkPos = drive.trajectoryBuilder(yellowScorePos.end())
+                        .splineTo(new Vector2d(60,60), 0)
+                        .build();
                 telemetry.addData("POS", "RIGHT");
                 break;
             default:
@@ -110,6 +136,7 @@ public class BlueAuto extends LinearOpMode {
         }
         telemetry.update();
         waitForStart();
+
         int startPosition = flip.getCurrentPosition();
         flip.setTargetPosition(startPosition);
         flip.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -118,24 +145,19 @@ public class BlueAuto extends LinearOpMode {
         leftClaw.setPosition(1);
 
 
-        Pose2d startPose = new Pose2d(15, 60, Math.toRadians(270));
-
-        drive.setPoseEstimate(startPose);
-        Trajectory purple = drive.trajectoryBuilder(startPose)
-                        .splineTo(purpleScorePos, 0)
-                                .build();
-
-        Trajectory yellow = drive.trajectoryBuilder(purple.end())
-                .splineTo(yellowScorePos, 0)
-                .build();
-        Trajectory park = drive.trajectoryBuilder(yellow.end())
-                .splineTo(parkPos, 0)
-                .build();
-
-        drive.followTrajectory(purple);
+        drive.followTrajectory(purpleScorePos);
+        rightWrist.setPosition(0.6);
+        leftWrist.setPosition(0.4);
+        rightClaw.setPosition(1);
+        sleep(3000);
+        drive.followTrajectory(yellowScorePos);
+        rightWrist.setPosition(0.75);
+        leftWrist.setPosition(0.25);
+        flip.setTargetPosition(-1700);
+        sleep(3000);
         leftClaw.setPosition(0);
-        drive.followTrajectory(yellow);
-        drive.followTrajectory(park);
+        sleep(3000);
+        drive.followTrajectory(parkPos);
 
 
     }
