@@ -26,7 +26,7 @@ public class FindRegionPipeline extends OpenCvPipeline {
 
         Imgproc.cvtColor(input, YCrCb, Imgproc.COLOR_RGB2YCrCb);
 
-        Rect leftRect = new Rect(90, 50, 155, 195); // 165 160 105 140
+        Rect leftRect = new Rect(60, 70, 155, 195); // 165 160 105 140
         Rect rightRect = new Rect(770, 40, 155, 155); // 370 160 105 95
 
         input.copyTo(output);
@@ -55,9 +55,9 @@ public class FindRegionPipeline extends OpenCvPipeline {
     }
 
     public Side getLocation() {
-        if (leftAvgFinal - rightAvgFinal > 20) {
+        if (leftAvgFinal - rightAvgFinal > 7) {
             return Side.LEFT;
-        } else if (rightAvgFinal > leftAvgFinal) {
+        } else if (rightAvgFinal - leftAvgFinal >5) {
             return Side.CENTER;
         } else {
             return Side.RIGHT;

@@ -57,60 +57,67 @@ public class Main extends LinearOpMode {
             double flipPower = 1f;
             double y = gamepad1.left_stick_y; // Remember, Y stick value is reversed
             double x = -gamepad1.left_stick_x;
-            double rx = gamepad1.right_stick_x;
+            double rx = -gamepad1.right_stick_x;
 
             // This button choice was made so that it is hard to hit on accident,
             // it can be freely changed based on preference.
-            // The equivalent button is start on Xbox-style controllers.
-            if (gamepad1.options) {
-                imu.resetYaw();
-            }
-
-            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-
-            // Rotate the movement direction counter to the bot's rotation
-            double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
-            double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
-
-            rotX = rotX * 1.1;  // Counteract imperfect strafing
+//            // The equivalent button is start on Xbox-style controllers.
+//            if (gamepad1.options) {
+//                imu.resetYaw();
+//            }
+//
+//            double botHeading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+//
+//            // Rotate the movement direction counter to the bot's rotation
+//            double rotX = x * Math.cos(-botHeading) - y * Math.sin(-botHeading);
+//            double rotY = x * Math.sin(-botHeading) + y * Math.cos(-botHeading);
+//
+//            rotX = rotX * 1.1;  // Counteract imperfect strafing
 
             // Denominator is the largest motor power (absolute value) or 1
             // This ensures all the powers maintain the same ratio,
             // but only if at least one is out of the range [-1, 1]
-            double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(rx), 1);
-            double frontLeftPower = (rotY + rotX + rx) / denominator;
-            double backLeftPower = (rotY - rotX + rx) / denominator;
-            double frontRightPower = (rotY - rotX - rx) / denominator;
-            double backRightPower = (rotY + rotX - rx) / denominator;
+            double denominator = Math.max(Math.abs(y) + Math.abs(x) + Math.abs(rx), 1);
+            double frontLeftPower = (y + x + rx) / denominator;
+            double backLeftPower = (y - x + rx) / denominator;
+            double frontRightPower = (y - x - rx) / denominator;
+            double backRightPower = (y+ x- rx) / denominator;
 
             rightElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
             leftElevator.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
-            if (gamepad1.right_bumper) {
+            if (gamepad1.right_bumper || gamepad2.right_bumper) {
                 flip.setTargetPosition((flip.getTargetPosition())+20);
             } else if (gamepad1.left_bumper) {
                 flip.setTargetPosition((flip.getTargetPosition())-20);
+            } else {
+                flip.setTargetPosition(flip.getTargetPosition()+Math.round(50*(gamepad2.right_trigger-gamepad2.left_trigger)));
             }
-            if (gamepad1.dpad_right) {
+            if (gamepad1.dpad_right || gamepad2.right_bumper) {
                 rightWrist.setPosition(rightWrist.getPosition()+0.05);
                 leftWrist.setPosition(1-rightWrist.getPosition());
-            } else if (gamepad1.dpad_left) {
+            } else if (gamepad1.dpad_left || gamepad2.left_bumper) {
                 rightWrist.setPosition(rightWrist.getPosition()-0.05);
                 leftWrist.setPosition(1-rightWrist.getPosition());
             }
             if (gamepad1.a) {
-                rightClaw.setPosition(1);
-            }
-            if (gamepad1.b) {
-                leftClaw.setPosition(0.2);
-            }
-            if (gamepad1.y) {
+                rightClaw.setPosition(0.8);
+            } else if (gamepad1.b) {
+                leftClaw.setPosition(0);
+            } else if (gamepad1.y) {
                 rightClaw.setPosition(0);
-            }
-            if (gamepad1.x) {
+            } else if (gamepad1.x) {
                 leftClaw.setPosition(1);
+            } else {
+                rightClaw.setPosition(rightClaw.getPosition()+(0.05* (gamepad2.dpad_right ? 1:0)));
+                rightClaw.setPosition(rightClaw.getPosition() - (0.05 * (gamepad2.dpad_left? 1:0)));
+                leftClaw.setPosition(leftClaw.getPosition()-(0.05* (gamepad2.dpad_up ? 1:0)));
+                leftClaw.setPosition(leftClaw.getPosition() + (0.05 * (gamepad2.dpad_down? 1:0)));
             }
             if (gamepad1.dpad_down) {
                 flip.setTargetPosition(startPosition);
+            }
+            if (gamepad1.dpad_up) {
+                flip.setTargetPosition(-1400);
             }
 
             flip.setPower(flipPower);
@@ -133,8 +140,7 @@ public class Main extends LinearOpMode {
             telemetry.addData("left wrist position", leftWrist.getPosition());
             telemetry.addData("right claw position", rightClaw.getPosition());
             telemetry.addData("left claw position", leftClaw.getPosition());
-
-            telemetry.addData("bot heading", botHeading);
+            
             telemetry.update();
         }
     }

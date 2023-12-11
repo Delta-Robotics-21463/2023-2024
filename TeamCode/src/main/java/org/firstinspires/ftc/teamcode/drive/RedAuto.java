@@ -20,8 +20,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 @Config
-@Autonomous(name = "Blue Auto")
-public class BlueAuto extends LinearOpMode {
+@Autonomous(name = "Red Auto")
+public class RedAuto extends LinearOpMode {
 
 
     private FindRegionPipeline propPipeline;
@@ -43,24 +43,24 @@ public class BlueAuto extends LinearOpMode {
         Globals.IS_AUTO = true;
         Globals.IS_USING_IMU = false;
         Globals.USING_DASHBOARD = true;
-        Globals.COLOR = Side.BLUE;
+        Globals.COLOR = Side.RED;
 
 
         propPipeline = new FindRegionPipeline(Globals.COLOR);
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         OpenCvCamera camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(WebcamName.class, "Webcam 1"), cameraMonitorViewId);
         camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-                                         @Override
-                                         public void onOpened() {
-                                             camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
-                                         }
+            @Override
+            public void onOpened() {
+                camera.startStreaming(1280, 720, OpenCvCameraRotation.UPRIGHT);
+            }
 
-                                         @Override
-                                         public void onError(int errorCode) {
+            @Override
+            public void onError(int errorCode) {
 
-                                         }
-                                     });
-        
+            }
+        });
+
 
         camera.setPipeline(propPipeline);
 
@@ -84,49 +84,49 @@ public class BlueAuto extends LinearOpMode {
 
 
         // 0.3, 300
-        Pose2d startPose = new Pose2d(15, 60, Math.toRadians(270));
+        Pose2d startPose = new Pose2d(15, -60, Math.toRadians(90));
         drive.setPoseEstimate(startPose);
 
         switch (side) {
             case LEFT:
                 // TODO: add poses
                 purpleScorePos = drive.trajectoryBuilder(startPose)
-                        .splineTo(new Vector2d(33, 56), 0)
-                        .splineTo(new Vector2d(42, 37.5), Math.toRadians(180))
+                        .splineTo(new Vector2d(15, -38), Math.toRadians(180))
                         .build();
 
-//                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
-//                        .splineToConstantHeading(new Vector2d(51,45), Math.toRadians(180))
-//                        .build();
+                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
+                        .splineToConstantHeading(new Vector2d(51,-45), Math.toRadians(180))
+                        .build();
                 parkPos = drive.trajectoryBuilder(purpleScorePos.end())
-                        .splineTo(new Vector2d(60,60), 0)
+                        .splineTo(new Vector2d(60,-60), 0)
                         .build();
                 telemetry.addData("POS", "LEFT");
                 break;
             case CENTER:
                 purpleScorePos = drive.trajectoryBuilder(startPose)
-                        .splineTo(new Vector2d(12, 38), Math.toRadians(270))
+                        .splineTo(new Vector2d(12, -38), Math.toRadians(90))
                         .build();
 
-//                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
-//                        .splineToConstantHeading(new Vector2d(15, 45 ),Math.toRadians(270))
-//                        .splineTo(new Vector2d(51,32), Math.toRadians(180))
-//                        .build();
+                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
+                        .splineToConstantHeading(new Vector2d(15, -45 ),Math.toRadians(90))
+                        .splineTo(new Vector2d(51,-32), Math.toRadians(180))
+                        .build();
                 parkPos = drive.trajectoryBuilder(purpleScorePos.end())
-                        .splineTo(new Vector2d(60,60), 0)
+                        .splineTo(new Vector2d(60,-60), 0)
                         .build();
                 telemetry.addData("POS", "CENTER");
                 break;
             case RIGHT:
                 purpleScorePos = drive.trajectoryBuilder(startPose)
-                        .splineTo(new Vector2d(17.5, 40), Math.toRadians(180))
+                        .splineTo(new Vector2d(33, -56), 0)
+                        .splineTo(new Vector2d(38, -36), Math.toRadians(180))
                         .build();
 
-//                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
-//                        .splineToConstantHeading(new Vector2d(51,40), Math.toRadians(180))
-//                        .build();
+                yellowScorePos = drive.trajectoryBuilder(purpleScorePos.end())
+                        .splineToConstantHeading(new Vector2d(51,-40), Math.toRadians(180))
+                        .build();
                 parkPos = drive.trajectoryBuilder(purpleScorePos.end())
-                        .splineTo(new Vector2d(60,60), 0)
+                        .splineTo(new Vector2d(60,-60), 0)
                         .build();
                 telemetry.addData("POS", "RIGHT");
                 break;
@@ -134,8 +134,8 @@ public class BlueAuto extends LinearOpMode {
                 break;
         }
         telemetry.update();
-        rightClaw.setPosition(0.5);
-        leftClaw.setPosition(0.6);
+        rightClaw.setPosition(0);
+        leftClaw.setPosition(1);
         waitForStart();
 
         int startPosition = flip.getCurrentPosition();
@@ -148,9 +148,9 @@ public class BlueAuto extends LinearOpMode {
         drive.followTrajectory(purpleScorePos);
         flip.setTargetPosition(startPosition);
         rightWrist.setPosition(0.6);
-        leftWrist.setPosition(0.5);
+        leftWrist.setPosition(0.4);
         sleep(500);
-        rightClaw.setPosition(1);
+        leftClaw.setPosition(0);
         sleep(1000);
         rightWrist.setPosition(0.8);
         leftWrist.setPosition(0.2);
@@ -161,7 +161,7 @@ public class BlueAuto extends LinearOpMode {
 //
 //        }
 //        sleep(500);
-//        leftClaw.setPosition(0);
+//        rightClaw.setPosition(1);
 //        sleep(3000);
         drive.followTrajectory(parkPos);
 
